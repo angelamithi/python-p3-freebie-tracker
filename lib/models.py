@@ -20,7 +20,10 @@ class Company(Base):
     def __repr__(self):
         return f'<Company {self.name}>'
     freebie = relationship('Freebie', backref='company')
-    devs = relationship('Dev', secondary='company_dev', back_populates='companies')
+    devs = relationship('Dev', secondary='companies_devs', back_populates='companies')
+
+    def company_freebies(self):
+        return session.query(Freebie).filter_by(company_id=self.id).all()
 
 class Dev(Base):
     __tablename__ = 'devs'
@@ -31,7 +34,7 @@ class Dev(Base):
     def __repr__(self):
         return f'<Dev {self.name}>'
     freebie = relationship('Freebie', backref='dev')
-    companies = relationship('Company', secondary='company_dev', back_populates='devs')
+    companies = relationship('Company', secondary='companies_devs', back_populates='devs')
 
 class Freebie(Base):
     __tablename__ = 'freebies'
@@ -42,7 +45,7 @@ class Freebie(Base):
     company_id = Column(Integer(), ForeignKey('companies.id'))
     dev_id = Column(Integer(), ForeignKey('devs.id'))
 
-company_dev = Table(
+company_dev= Table(
     'companies_devs',
     Base.metadata,
     Column('company_id', ForeignKey('companies.id'), primary_key=True),
@@ -55,3 +58,10 @@ Base.metadata.create_all(engine)
 
 Session = sessionmaker(bind=engine)
 session = Session()
+
+company4=session.query(Company).get(4)
+company4_freebies=company4.company_freebies()
+for freebie in company4_freebies:
+    print(f"Company 4 Freebies: {freebie.item_name}")
+
+

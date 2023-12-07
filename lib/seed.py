@@ -6,6 +6,7 @@ from models import Company,Dev,Freebie,company_dev,session
 session.query(Company).delete()
 session.query(Dev).delete()
 session.query(Freebie).delete()
+session.query(company_dev).delete()
 session.commit()
 companies_info=[{
   "id": 1,
@@ -162,5 +163,27 @@ freebie_info=[
 session.add_all([Freebie(**freebie) for freebie in freebie_info])
 session.commit()
 
-
+rls=[
+  {"id": 1, "company_id": 3, "dev_id": 8},
+  {"id": 2, "company_id": 7, "dev_id": 5},
+  {"id": 3, "company_id": 2, "dev_id": 7},
+  {"id": 4, "company_id": 6, "dev_id": 1},
+  {"id": 5, "company_id": 9, "dev_id": 4},
+  {"id": 6, "company_id": 1, "dev_id": 10},
+  {"id": 7, "company_id": 4, "dev_id": 2},
+  {"id": 8, "company_id": 8, "dev_id": 9},
+  {"id": 9, "company_id": 5, "dev_id": 3},
+  {"id": 10, "company_id": 10, "dev_id": 6}
+]
+dev1=session.query(Dev).filter_by(id=7).first()
+dev1.companies.append(session.query(Company).filter_by(id=2).first())
+dev2=session.query(Dev).filter_by(id=8).first()
+dev2.companies.append(session.query(Company).filter_by(id=3).first())
+dev3=session.query(Dev).filter_by(id=5).first()
+dev3.companies.append(session.query(Company).filter_by(id=7).first())
+dev4=session.query(Dev).filter_by(id=4).first()
+dev4.companies.append(session.query(Company).filter_by(id=9).first())
+dev5=session.query(Dev).filter_by(id=10).first()
+dev5.companies.append(session.query(Company).filter_by(id=1).first())
+session.commit()
 
