@@ -27,6 +27,15 @@ class Company(Base):
     #session.query(Freebie).filter_by(company_id=self.id).all()
     def company_devs(self):
         return self.devs    
+    def give_freebie(self,dev, item_name, value):
+        new_freebie=Freebie(dev=dev,company=self,item_name=item_name, value=value)
+        self.add(new_freebie)
+        session.commit()
+    @classmethod
+    def oldest_company(cls):
+        return cls.query.order_by(cls.founding_year).first()
+    
+
     
 class Dev(Base):
     __tablename__ = 'devs'
@@ -44,7 +53,15 @@ class Dev(Base):
     #session.query(Freebie).filter_by(dev_id=self.id).all()
     def dev_companies(self):
         return self.companies
+    
+    def received_one(self, item_name):
+        return any(freebie.item_name == item_name for freebie in self.freebies)
 
+    def give_away(self, other_dev, freebie):
+        if freebie.dev == self:
+            freebie.dev = other_dev
+            session.commit()
+    
 
 class Freebie(Base):
     __tablename__ = 'freebies'
@@ -59,7 +76,9 @@ class Freebie(Base):
          return self.dev.name
     def company_instance_for_freebie(self):
         return self.company.name
-    
+    def print_details(self):
+        return f"{self.dev.name} owns a {self.item_name} from {self.company.name}"
+
 
 
 company_dev= Table(
@@ -103,3 +122,9 @@ print(f"Dev who got freebie4:{freebie4_dev}")
 freebie1=session.query(Freebie).get(9)
 freebie1_company=freebie1.company_instance_for_freebie()
 print(f'Freebie name:{freebie1_company}')
+
+
+print_details_instance =session.query(Freebie).get(3)
+details_string = print_details_instance.print_details()
+print(details_string)
+
